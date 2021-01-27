@@ -1,0 +1,23 @@
+#class combat open;
+
+#event {RECEIVED LINE} {
+
+    #if { "$opo[name]" != "None." 
+
+    && "$my[state]" != "fighting" 
+
+    && "$my[name]" == "%w" } {
+
+        #var my[state] fighting;
+
+        };
+
+    };
+
+#act {^$} {
+
+    #if { "$my[state]" == "fighting" && "$compact_fight" == "1" } { #line gag };
+
+    } {11};
+
+#class combat close;

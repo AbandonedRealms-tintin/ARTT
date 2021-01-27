@@ -1,0 +1,396 @@
+#class msdp open;
+
+#nop { MSDP is a data protocol to send out of bounds communication between a MUD
+server and a MUD client, and is specifically targeted at client side scripts:
+http://tintin.sourceforge.net/msdp/ };
+
+#nop { Possible AbandonedRealms MSDP variables:
+
+AFFECTS         EXPERIENCE      EXPERIENCE_MAX  EXPERIENCE_TNL
+SHIELD          POWER           CHII            HEALTH
+HEALTH_MAX      MANA            MANA_MAX        MOVEMENT
+MOVEMENT_MAX    HITROLL         DAMROLL         AREA_NAME
+ROOM_EXITS      ROOM_NAME       ROOM_VNUM       ROOM_DESC
+WORLD_TIME      ROOM_MAP        ROOM_TERRAIN    GROUP
+CHANNELS        INVENTORY       COMBAT_STYLE    OPPONENT_COMBAT_STYLE
+QUESTOR         CHARACTER_NAME  ADRENALINE      OPPONENT_WEAPON_OFFH
+RACE            CLASS           GOLD            SHIELD_MAX
+OPPONENT_NAME   OPPONENT_LEVEL  OPPONENT_HEALTH OPPONENT_HEALTH_MAX
+AC_PIERCE       AC_BASH         AC_SLASH        AC_MAGIC
+SAVING_AFF      SAVING_MAL      SAVING_MEN      TITLE
+WEIGHT          WEIGHT_MAX      TANK_NAME       HUNGER
+THIRST          OVERLORD        POKER
+
+note: opponent_health shows % of opponents max health.
+note: experience variables don't seem accurate, is it because of 'exp extra'? };
+
+#format IAC  %a 255;
+#format DONT %a 254;
+#format DO   %a 253;
+#format WONT %a 252;
+#format WILL %a 251;
+#format SB   %a 250;
+#format SE   %a 240;
+#format MSDP %a  69;
+#format VAR  %a  01;
+#format VAL  %a  02;
+
+#nop { Ask MSDP to report these };
+
+#var REPORTABLE_VARIABLES {
+    {WORLD_TIME};
+    {CHANNELS};
+    {GROUP};
+    {TANK_NAME};
+
+    #nop { Room data };
+    {ROOM_MAP};
+    {ROOM_NAME};
+    {ROOM_EXITS};
+    {ROOM_TERRAIN};
+    {ROOM_VNUM};
+    {ROOM_DESC};
+    {AREA_NAME};
+
+    #nop { Character data };
+    {CHARACTER_NAME};
+    {CLASS};
+    {RACE};
+    {HEALTH};
+    {HEALTH_MAX};
+    {MANA};
+    {MANA_MAX};
+    {MOVEMENT};
+    {MOVEMENT_MAX};
+    {COMBAT_STYLE};
+    {WEAPON_TYPE};
+    {GOLD};
+    {HUNGER};
+    {THIRST};
+    {INVENTORY};
+    {AFFECTS};
+	{WEIGHT};
+	{WEIGHT_MAX};
+    {EXPERIENCE};
+    {EXPERIENCE_MAX};
+
+#nop { Opponent data };
+    {OPPONENT_NAME};
+    {OPPONENT_LEVEL};
+    {OPPONENT_HEALTH};
+    {OPPONENT_HEALTH_MAX};
+    };
+
+#nop { Turn telnet debug off once everything works as it's spammy. };
+
+#config {debug telnet} {off};
+
+#alias {replace_color_codes} {
+
+    #replace {%1} {`1}  {<018>};
+    #replace {%1} {`2}  {<028>};
+    #replace {%1} {`3}  {<038>};
+    #replace {%1} {`4}  {<048>};
+    #replace {%1} {`5}  {<058>};
+    #replace {%1} {`6}  {<068>};
+    #replace {%1} {`7}  {<eee>};
+    #replace {%1} {`8}  {<ccc>};
+    #replace {%1} {`9}  {<158>};
+    #replace {%1} {`!}  {<118>};
+    #replace {%1} {`@}  {<128>};
+    #replace {%1} {`#}  {<138>};
+    #replace {%1} {`\$} {<148>};
+    #replace {%1} {`%}  {<158>};
+    #replace {%1} {`^}  {<168>};
+    #replace {%1} {`&}  {<178>};
+    #replace {%1} {``}  {<088>};
+
+    };
+
+#event {IAC WILL MSDP} {#send {$IAC$DO$MSDP\}};
+
+#event {IAC SB MSDP} {
+
+    #nop { Save all variables with an MSDP_ prefix. };
+
+    #var {MSDP_%0} {%1};
+
+    #if { "%0" == "ROOM_MAP" } {
+
+        replace_color_codes MSDP_ROOM_MAP;
+
+        #nop { Replace map spaces with underscores. };
+
+        #replace {MSDP_ROOM_MAP} { }   {_};
+
+        #nop { Capture map rows inbetween m and ]. };
+
+        #replace {MSDP_ROOM_MAP} {\r}  {m};
+
+        #replace {MSDP_ROOM_MAP} {\n}  {]};
+
+        #list map_ clear;
+
+        #list map clear;
+
+        #list charlist clear;
+
+        #nop { Split map into rows to count number of spaces in each row. };
+
+        #if { "$MSDP_ROOM_MAP" == "%+]m%+]m%+]m%+]m%+]m%+]m%+]m%+]m%+]m%+$" } {
+
+            #regexp {$MSDP_ROOM_MAP} {%+]m%+]m%+]m%+]m%+]m%+]m%+]m%+]m%+]m%+$} {
+
+                #list map_ add &1;
+                #list map_ add &2;
+                #list map_ add &3;
+                #list map_ add &4;
+                #list map_ add &5;
+                #list map_ add &6;
+                #list map_ add &7;
+                #list map_ add &8;
+                #list map_ add &9;
+
+                };
+
+            } {
+
+            #regexp {$MSDP_ROOM_MAP} {%+]m%+]m%+]m%+]m%+]m%+]m%+]m%+]m%+]m} {
+
+                #list map_ add &1;
+                #list map_ add &2;
+                #list map_ add &3;
+                #list map_ add &4;
+                #list map_ add &5;
+                #list map_ add &6;
+                #list map_ add &7;
+                #list map_ add &8;
+                #list map_ add &9;
+
+                };
+
+            };
+
+        #nop { Replace spaces with underscores. };
+
+        #foreach $map_[] row {
+
+            #format {row_length} {%L} {$map_[$row]};
+
+            #nop { Find out if map row is too short. };
+
+            #if { $row_length < 9 } {
+
+                #nop { How much less than 9 is it? };
+
+                #math {blank} { 9 - $row_length };
+
+                #nop { Replace spaces with underscores to make map square. };
+
+                #format {square_map} {$map_[$row]%.${blank}s<088>} {_________};
+
+                } {
+
+                #nop { If length=9, just leave it. };
+
+                #var {square_map} {$map_[$row]<088>};
+
+                };
+
+            #nop { For mapping.tin };
+
+            #list charlist add $square_map;
+
+            #nop { Replace underscores with spaces. };
+
+            #replace {square_map} {_} {<088> };
+
+            #list map add {${square_map}};
+
+            };
+
+        };
+
+    #if { "%0" == "ROOM_NAME" } {
+
+        #var room[name] %1;
+
+        #nop { Without this 'if' statement, next act will gag everything. };
+
+        #if { "$MSDP_ROOM_NAME" == "" } {
+
+            #var {MSDP_ROOM_NAME} {Unknown.};
+
+            };
+
+        #act {^$MSDP_ROOM_NAME} { #if { "$gag_roomname" == "1" } {#line gag}};
+
+        #if { "$MSDP_ROOM_NAME" != "$last_room_name" } {#unact $last_room_name};
+
+        #var {last_room_name} {$MSDP_ROOM_NAME};
+
+        };
+
+    #if { "%0" == "ROOM_EXITS" } {
+
+        #list testexits clear;
+
+        #nop { Reformat msdp room exits to abbreviate directions. };
+
+        #foreach {$MSDP_ROOM_EXITS} {showexit} {
+
+            #if { "$showexit" == "%w" } {
+
+                #format {showexit} {%.1s} {$showexit};
+
+                #var test1 $showexit;
+
+                };
+
+            #if { "$showexit" == "%d" } {#var test2 $showexit};
+
+        #vari {testexits[$test1]} {$test2};
+
+            }
+
+        #var room[exits] {$testexits};
+
+        };
+
+    #if { "%0" == "ROOM_VNUM" } {#var room[vnum] %1};
+
+    #if { "%0" == "ROOM_TERRAIN" } {#var room[terrain] %1};
+
+    #if { "%0" == "ROOM_DESC" } {
+
+        #nop { Variable wordwrapped for use in Tintin++ map. };
+
+        #replace {MSDP_ROOM_DESC} {\r}  { };
+
+        #replace {MSDP_ROOM_DESC} {\n}  {};
+
+        #var room[desc] $MSDP_ROOM_DESC;
+
+        };
+
+    #if { "%0" == "AREA_NAME" } {#var room[area] %1};
+
+    #if { "%0" == "WORLD_TIME" } {#var time %1};
+
+    #if { "%0" == "OPPONENT_NAME" } {#var opo[name] %1};
+
+    #if { "%0" == "OPPONENT_LEVEL" } {#var opo[lvl] %1};
+
+    #if { "%0" == "OPPONENT_HEALTH" } {#var opo[hp_percent] %1};
+
+    #if { "%0" == "OPPONENT_HEALTH_MAX" } {#var opo[hp_max] %1};
+
+    #if { "%0" == "CHARACTER_NAME" } {#var my[name] %1};
+
+    #if { "%0" == "RACE" } {#var my[race] %1};
+
+    #if { "%0" == "CLASS" } {#var my[class] %1};
+
+    #if { "%0" == "HEALTH" } {#var my[hp] %1};
+
+    #if { "%0" == "MANA" } {#var my[mp] %1};
+
+    #if { "%0" == "MOVEMENT" } {#var my[mv] %1};
+
+    #if { "%0" == "HEALTH_MAX" } {#var my[hp_max] %1};
+
+    #if { "%0" == "MANA_MAX" } {#var my[mp_max] %1};
+
+    #if { "%0" == "MOVEMENT_MAX" } {#var my[mv_max] %1};
+
+	#if { "%0" == "WEIGHT" } {#var my[wt] %1};
+
+	#if { "%0" == "WEIGHT_MAX" } {#var my[wt_max] %1};
+
+    #if { "%0" == "HUNGER" } {#var my[hunger] %1};
+
+    #if { "%0" == "THIRST" } {#var my[thirst] %1};
+
+    #if { "%0" == "GOLD" } {#var my[gold] %1};
+
+    #if { "%0" == "INVENTORY" } {#var my[inventory] {%1}};
+
+    #if { "%0" == "AFFECTS" } {#var my[affects] {%1}};
+
+    #if { "%0" == "GROUP" } {#var my[group] {%1}};
+
+    #if { "%0" == "WEAPON_TYPE" } {
+
+        replace_color_codes MSDP_WEAPON_TYPE;
+
+        #var my[weapon_type] $MSDP_WEAPON_TYPE;
+
+        };
+
+    #if { "%0" == "COMBAT_STYLE" } {
+
+        replace_color_codes MSDP_COMBAT_STYLE;
+
+        #var my[combat_style] $MSDP_COMBAT_STYLE;
+
+        };
+
+    #if { "%0" == "CHANNELS" } {
+
+        replace_color_codes MSDP_CHANNELS;
+
+        #var my[CHANNELS] $MSDP_CHANNELS;
+
+        };
+
+    #nop { If msdp is loaded set msdp_active variable and showme message. };
+
+    #if { "$msdp_active" != "1" && "$my[name]" == "%w" } {
+
+        #var msdp_active 1;
+
+        #showme {<cfa>Loading ARTT scripts...<088>};
+
+        };
+
+    };
+
+#nop { This event is generated at the end of an MSDP sub negotiation. };
+
+#event {IAC SB MSDP IAC SE} {#nop};
+
+#nop { Ask the server to report all keys inside REPORTABLE_VARIABLES. };
+
+#alias {msdp_report} {
+
+    #var result {$IAC$SB$MSDP${VAR}REPORT};
+
+    #foreach {$REPORTABLE_VARIABLES[]} {tmp} {
+
+        #var result {$result${VAL}$tmp}
+
+        };
+
+    #send {$result$IAC$SE\}
+
+    };
+
+#alias {msdp_list} {#send {$IAC$SB$MSDP${VAR}LIST${VAL}%0$IAC$SE\}};
+
+#alias {msdp_send} {#send {$IAC$SB$MSDP${VAR}SEND${VAL}%0$IAC$SE\}};
+
+#nop { If msdp_report hasn't been sent, send msdp_report and unevent. };
+
+#if { "$msdp_active" != "1" } {
+
+    #event {RECEIVED PROMPT} {
+
+        #delay {.50} {msdp_report};
+        
+        #unevent {RECEIVED PROMPT};
+
+        };
+
+    };
+
+#class msdp close;

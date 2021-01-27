@@ -1,0 +1,328 @@
+#nop { mapping.tin };
+
+#nop { mapping.tin syntax:
+
+Use the 'makemap' command to create a map or continue mapping.
+
+Use the 'savemap' command to save your progress and quit mapping.
+
+Use the 'killmap' command to delete your map and quit mapping.
+
+NOTE: Install tintin++ from source code to use ALL map functions (run)
+
+NOTE: You must not run too quickly when making a map! };
+
+#class mapping open;
+
+#alias {makemap} {
+
+    #nop { If first_vnum don't exist, map don't exist yet. }
+
+    #nop { If you_are_sure ain't set, do cmd again within 25 secs to exec. };
+
+    #if { "$first_vnum" != "%d" && "$you_are_sure"!="1" } {
+
+        #echo {You must return to this room each time you begin mapping.};
+
+        #echo {Type '<cfa>makemap<088>' again to start your map here.};
+
+        #echo { };
+
+        #var you_are_sure 1;
+
+        #delay {25} {#unvar you_are_sure};
+
+        #return;
+
+        };
+
+    #nop { If you are sure you wanna start the map here. };
+
+    #if { "$you_are_sure"=="1" } {
+
+        #echo {File map.tin created!  Move about to expand your map.};
+
+        #echo {Type '<cfa>savemap<088>' to save your map and finish.};
+
+        #echo { };
+
+        #unvar you_are_sure;
+
+        #map create;
+
+        #map goto 1;
+
+        #var map_mode 1;
+
+        #return;
+
+        };
+
+    #nop { If first_vnum exists than you previously created map. };
+
+    #if { "$first_vnum" == "%d" } {
+
+        #nop { If you're in the room where you started the map. };
+
+        #if { "$first_vnum" == "$room[vnum]" } {
+
+            #if { "$map_mode" != "1" } {
+
+                #echo {File map.tin loaded!  Move about to expand your map.};
+
+                #echo {Type '<cfa>savemap<088>' to save your map and finish.};
+
+                #map read map.tin;
+
+                #map goto $first_vnum;
+
+                #var map_mode 1;
+
+                } {
+
+                #echo {You are already in map mode!};
+
+                #echo {Type '<cfa>savemap<088>' to save your map and finish.};
+
+                };
+
+            } {
+
+            #echo {Return to '<cfa>$first_room<088>' before starting again!};
+
+            };
+
+        };
+
+    };
+
+#alias {killmap} {
+
+    #class variable open;
+
+        #unvar first_room;
+
+        #unvar first_vnum;
+
+    #class variable close;
+
+    #class variable write saved.tin;
+
+    #map destroy;
+
+    #showme {<cfa>Map killed...<088>};
+
+    #var map_mode 0;
+
+    };
+
+#alias {savemap} {
+
+    #if { "$first_vnum" == "%d" } {
+
+        #class variable write saved.tin;
+
+        #map write map.tin;
+
+        #showme {<cfa>Map saved...<088>};
+
+        #map leave;
+
+        #var map_mode 0;
+
+        } {
+
+        #showme {You haven't even started mapping yet!};
+
+        };
+
+    };
+
+#nop { This variable is set in prompt.tin when AR exits are shown. };
+
+#event {VARIABLE UPDATE exits} {
+
+    #if { "$map_mode" == "1" } {
+
+        #nop { Color rooms and set symbols based on terrain. };
+
+        set_room_symbol inside * <eee>;
+
+        set_room_symbol city + <eee>;
+
+        set_room_symbol road + <ccc>;
+
+        set_room_symbol cave o <ccc>;
+
+        set_room_symbol forest f <028>;
+
+        set_room_symbol field o <028>;
+
+        set_room_symbol hills z <028>;
+
+        set_room_symbol mountain x <038>;
+
+        set_room_symbol sand ! <038>;
+
+        set_room_symbol pond ~ <168>;
+
+        set_room_symbol river ~ <168>;
+
+        set_room_symbol underwater ~ <048>;
+
+        #nop { Set the direction used to return to previous room. };
+
+        #path save b pathback;
+        #path del;
+        #path end;
+        #path new;
+
+        #nop { Color rooms and set symbols for temples, shops, banks, etc. };
+
+        #list mapchar clear;
+        findchar 3;
+        findchar 5;
+        findchar 7;
+
+        setsymbol 5 7 S e shop <038>;
+        setsymbol 5 7 T e temple <178>;
+        setsymbol 5 7 F e food <038>;
+        setsymbol 5 7 B e bank <eee>;
+        setsymbol 5 7 N e nexus <eee>;
+
+        setsymbol 5 3 S w shop <038>;
+        setsymbol 5 3 T w temple <178>;
+        setsymbol 5 3 F w food <038>;
+        setsymbol 5 3 B w bank <eee>;
+        setsymbol 5 3 N w nexus <eee>;
+
+        setsymbol 3 5 S n shop <038>;
+        setsymbol 3 5 T n temple <178>;
+        setsymbol 3 5 F n food <038>;
+        setsymbol 3 5 B n bank <eee>;
+        setsymbol 3 5 N n nexus <eee>;
+
+        setsymbol 7 5 S s shop <038>;
+        setsymbol 7 5 T s temple <178>;
+        setsymbol 7 5 F s food <038>;
+        setsymbol 7 5 B s bank <eee>;
+        setsymbol 7 5 N s nexus <eee>;
+
+        #nop { Color rooms based on up and down exits. };
+
+        #forall {$room[exits][]} {
+
+            #if { "&0" == "u" } {#var up 1};
+
+            #if { "&0" == "d" } {#var down 1};
+
+            };
+
+        #if { "$up" == "1" && "$down" == "1" } {#map set roomcolor <118>};
+
+        #if { "$up" != "1" && "$down" == "1" } {#map set roomcolor <148>};
+
+        #if { "$up" == "1" && "$down" != "1" } {#map set roomcolor <158>};
+
+        #nop { Reset direction variables and color uknown terrains red. };
+
+        #var up 0;
+
+        #var down 0;
+
+        #var room_color <171>;
+
+        #nop { Unlink oneway rooms. };
+
+        #map get {roomexit} {EXIT_LIST};
+
+        #foreach {$EXIT_LIST[]} {EXIT} {
+
+            #if {&room[exits][$EXIT] == 0} {
+
+                #map unlink $EXIT;
+
+            };
+
+        };
+
+        #nop { Set msdp map variables. };
+
+        #map set roomterrain $room[terrain];
+
+        #map set roomname $room[name];
+
+        #map set roomdesc $room[desc];
+
+        #map set roomarea $room[area];
+
+        #map vnum $room[vnum];
+
+        #show {This is the map you are drawing:};
+
+        #map map 50x10;
+
+        #if { "$first_vnum" != "%d" } {
+
+            #class variable open;
+
+                #map get roomname first_room;
+
+                #map get roomvnum first_vnum;
+
+            #class variable close;
+
+            };
+
+        };
+
+    };
+
+#alias {set_room_symbol} {
+
+    #if { "$room[terrain]" == "%1" } {
+
+        #map set roomsymbol %2;
+
+        #map set roomcolor %3;
+
+        };
+
+    };
+
+#alias findchar {
+
+    #var {charlist_%1} {$charlist[%1]};
+    #replace {charlist_%1} {<%d>} {};
+    #replace {charlist_%1} {<%w>} {};
+
+    #regexp {$charlist_%1} {%.%.%.%.%.%.%.%.%.} {
+
+        #list mapchar[row%1] add &1;
+        #list mapchar[row%1] add &2;
+        #list mapchar[row%1] add &3;
+        #list mapchar[row%1] add &4;
+        #list mapchar[row%1] add &5;
+        #list mapchar[row%1] add &6;
+        #list mapchar[row%1] add &7;
+        #list mapchar[row%1] add &8;
+        #list mapchar[row%1] add &9;
+
+        };
+
+    };
+
+#alias {setsymbol} {
+
+    #if { "$mapchar[row%1][%2]" == "%3" && "$pathback" == "%4" } { 
+
+        #map move $pathback;
+        #map set roomnote %5;
+        #map set roomsymbol %3;
+        #map set roomcolor %6;
+        #map undo;
+
+        };
+    };
+
+#class mapping close;

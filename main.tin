@@ -1,0 +1,46 @@
+#nop { main.tin };
+
+#nop {  This script works with the online game:
+http://abandonedrealms.com/
+
+Get the software to run it here:
+http://tintin.sourceforge.net/
+
+Welcome to our fantasy based virtual reality:
+This is a fully-featured multiplayer experience with roleplaying and 
+playerkilling. As you play the game, you will make both great friends, and 
+vicious enemies - all real people who are playing alongside you! };
+
+#line quiet {
+#read config.tin;
+#read tick.tin;
+#read combat.tin;
+#read msdp.tin;
+#read prompt.tin;
+#read custom.tin;
+#read character.tin;
+#read connect.tin;
+#read mapping.tin;
+#read saved.tin;
+}
+
+#nop {
+ARTT 3.0.2
+-linux.sh now supports debian/CLI
+-linux.sh now supports debian/lxde
+-linux.sh now supports debian/gnome
+
+ARTT 3.0.3
+-linux.sh now supports debian/kde
+-linux.sh now supports debian/xfce
+
+ARTT 3.0.4
+-linux.sh now supports debian/mate
+-linux.sh now supports debian/cinnamon
+
+ARTT 3.0.5
+-added pretty option to prompt styles
+
+ARTT 3.0.6
+-added scale option to prompt styles
+};
