@@ -1,0 +1,982 @@
+#nop { AbandonedRealms.com };
+#nop { A Playerkilling, Roleplaying MUD };
+#nop { Scripts need Tintin++/Wintin++ to run };
+
+#kill;
+
+#nop { Config };
+#nop { ****** };
+
+#var {tmux[use]} {yes};
+
+#nop { is it linux? };
+#nop { ************ };
+
+#script {path} {
+
+    dmesg | grep -o "Linux" > /dev/null 2>&1 && echo 'yes' || echo 'no';
+    
+    };
+
+#var {have[linux]} {$path[1]};
+
+#if { "$have[linux]" == "yes" } {
+            
+    #nop { Check/kill existing tt++ process };
+    #nop { ******************************** };
+    
+    #script {tintin} {pidof tt++};
+    
+    #if { "$tintin[1]" != "%d" } {
+      
+        #show {<118>IMPROPER PROGRAM SHUTDOWN DETECTED, RESTART!<088>};
+        
+        #show {<118>EXIT GAME USING 'quit' OR 'exit' NEXT TIME!!<088>};
+        
+        #sys {sleep 3};
+        
+        #sys {tmux kill-server};
+        
+        };
+
+    #nop { Tintin help info };
+    #nop { **************** };
+
+    #show {<138>'#help' learn tt++ language.<088>};
+
+    #show {<138>'exit' to quit artt/tintin++<088>};
+
+    #nop { Chosen to use tmux? };
+    #nop { ******************* };
+    
+        #nop { have i tmux? };
+        #nop { ************ };
+
+        #script {path} {command -v tmux && echo 'yes' || echo 'no'};
+
+        #var {tmux[have]} {$path[2]};
+
+    #if { "$tmux[have]" == "yes" && "$tmux[use]" == "yes" } {
+        
+        #nop { is tmux open? };
+        #nop { ************* };
+
+        #script {path} {env | grep -q tmux && echo 'yes' || echo 'no'};
+        
+        #var {tmux[open]} {$path[1]};
+                
+        #if { "$tmux[open]" == "yes" } {
+                        
+            #nop { Get terminal width etc };
+            #nop { ********************** };
+
+            #script {path} {tput cols};
+            #var {tmux[term_wide]} {$path[1]};
+
+            #script {path} {tput lines};
+            #var {tmux[term_high]} {$path[1]};
+                      
+            #var {tmux[main_wide]} {81};
+            
+            #var {tmux[left_wide]} {12};
+            
+            #math {both_wide} { $tmux[main_wide] + $tmux[left_wide] };
+            
+            #math {tmux[right_wide]} { $tmux[term_wide] - $both_wide };
+            
+            #unvar {both_wide};
+                              
+            #nop { Count open panes, if count is 1 tmux is not setup };
+            #nop { ************************************************* };
+            
+            #script {path} {tmux list-panes};
+            
+            #var {tmux[open_panes]} {&path[]};
+                     
+            #if { $tmux[term_wide] > 120 && $tmux[open_panes] == 1 } {
+
+                #sys { tmux source $HOME/ARTT/tmux.conf };
+
+                #script {path} {
+                    
+                    if [ ! -d "$HOME/ARTT/log" ]; 
+                    
+                        then mkdir $HOME/ARTT/log; 
+                        
+                    fi;
+                    
+                    };
+                
+                #loop 5 1 cnt {#sys > log/0$cnt};                    
+                
+                #nop { any other tmux sessions named artt open? };
+                
+                #script {path} {
+                
+                    tmux has -t artt > /dev/null 2>&1 && echo 'yes' || echo 'no'
+                    
+                    };
+                    
+                #if { "$path[1]" == "yes" } {
+                
+                    #sys {tmux attach -t artt};
+                    
+                    } {
+                    
+                    #sys {tmux rename-session artt};
+                    
+                    };
+                
+                #nop { setup tmux panes for tail cmd of mud logs };
+                
+                #sys { tmux split -b -h -l $tmux[left_wide] 'tail -f log/01' };
+
+                #sys { tmux split -t %1 -l 1 'tail -f log/02' };
+
+                #sys { tmux split -t %0 -h -l $tmux[right_wide] };
+                
+                #nop { create pane 3. killp 3 so pane_id matches pane_indexes };
+                
+                #sys { tmux split -t %3 -p 75 'tail -f log/04' };
+                
+                #sys { tmux killp -t %3 };
+                
+                #sys { tmux split -t %4 -l 1 'tail -f log/05' };
+                
+                #sys { tmux selectp -L };
+                
+                };
+                      
+            #elseif { $tmux[term_wide] <= 120 && $tmux[open_panes] == 1 } {
+                
+                #show {<138>Maximize window size to use tmux.<088>};
+                
+                #show {<138>Or edit #var tmux[use] = no<088>};
+                
+                #sys {sleep 3};
+                
+                #end;
+                
+                };
+                  
+            } {
+            
+            #show {<138>Please enter 'tmux' first.<088>};
+            
+            #show {<138>Or edit #var tmux[use] = no<088>};
+            
+            #sys {sleep 3};
+            
+            #end;  
+                  
+            };
+
+        };
+        
+    #elseif { "$tmux[have]" == "no" && "$tmux[use]" == "yes" } {
+        
+        #show {<138>Please install tmux.<088>};
+        
+        #sys {sleep 3};
+        
+        #end;
+        
+        };
+
+    #nop { list scripts };
+    #nop { ************ };
+
+    #alias {ls} {
+        
+        #script {path} {pwd};
+        
+        #show <148>$path[1]<088>;
+        
+        #script {path} {ls *.tin};
+        
+        #if { "$path[1]" == "%!*.tin" } {
+        
+            #system { ls *.tin; };
+                
+            };
+                
+        };
+
+    #show {<138>use ls to list tt++ scripts.<088>};
+
+    #nop { check if vim is installed };
+    #nop { ************************* };
+    
+    #script {path} {command -v vim > /dev/null 2>&1 && echo 'yes' || echo 'no'};
+
+    #var have[vim] {$path[1]};
+    
+    #if { "$have[vim]" == "yes" } {
+
+        #nop { Configure tt++/vim highlighting syntax };
+        #nop { ************************************** };
+
+        #alias {syntax} {
+        
+            #script path {cat ~/.vimrc | grep 'syntax *'};
+            
+            #if { "$path[1]" == "syntax on" } {
+            
+                #sys {
+                
+                    find ~/ -name '.vimrc' | 
+                    xargs sed -i 's/syntax on/syntax off/g';
+                    
+                    };
+                    
+                #show {<138>coloured vim syntax off<088>};
+                
+                };
+                
+            #elseif { "$path[1]" == "syntax off" } {
+            
+                #sys {
+                
+                    find ~/ -name '.vimrc' | 
+                    xargs sed -i 's/syntax off/syntax on/g';
+                    
+                    };
+                
+                #show {<138>coloured vim syntax on<088>};
+                
+                };
+
+            };
+                    
+        #script {path} {
+        
+            [ -f $HOME/.vim/ftdetect/tt.vim ] 
+            
+            && echo "<138>'syntax' toggles vim colors.<088>" 
+            
+            || echo "<138>Added colored syntax to vim.<088>";
+            
+            }; 
+            
+        #show $path[1];
+        
+        #script {path} {
+            
+            if [ ! -d "$HOME/.vim" ]; 
+            
+                then mkdir $HOME/.vim; 
+                
+            fi;
+
+            if [ ! -d "$HOME/.vim/syntax" ]; 
+            
+                then mkdir $HOME/.vim/syntax; 
+                
+            fi;
+
+            if [ ! -d "$HOME/.vim/ftdetect" ]; 
+            
+                then mkdir $HOME/.vim/ftdetect;
+                
+            fi;
+
+            if [ ! -f "$HOME/.vim/syntax/tt.vim" ];
+            
+                then cp $HOME/ARTT/tt.vim $HOME/.vim/syntax;
+                
+            fi;
+            
+            if [ ! -f "$HOME/.vim/ftdetect/tt.vim" ];
+            
+                then echo "au BufNewFile,BufRead *.tt,*.tin set ft=tt" >> 
+                $HOME/.vim/ftdetect/tt.vim;
+                
+            fi;
+            
+            if [ ! -f "$HOME/.vimrc" ];
+            
+                then echo "syntax on" >> $HOME/.vimrc;
+                
+            fi;
+            
+            };
+
+        #show {<138>vi script.tin for CLI edits.<088>};
+
+        #alias {vi %1} {
+                
+            #system { vi %1; };
+                
+            #split 0 1;    
+                
+            };
+                            
+        } {
+
+        #show {<138>Please install vim.<088>};
+        
+        #sys {sleep 3};
+        
+        };
+
+    } {
+    
+    #show {<138>Please install Linux.<088>};
+    
+    };
+
+#nop { MSDP is a data protocol to send out of bounds communication between a MUD
+server and a MUD client, and is specifically targeted at client side scripts:
+http://tintin.sourceforge.net/msdp/ };
+
+#format IAC  %a 255;
+#format DONT %a 254;
+#format DO   %a 253;
+#format WONT %a 252;
+#format WILL %a 251;
+#format SB   %a 250;
+#format SE   %a 240;
+#format MSDP %a  69;
+#format VAR  %a  01;
+#format VAL  %a  02;
+
+#nop { Ask MSDP to report these };
+
+#nop { Turn telnet debug off once everything works as it's spammy. };
+
+#config {debug telnet} {off};
+
+#alias {replace_color_codes} {
+
+    #replace {%1} {`1}  {<018>}; #nop {RED};
+    #replace {%1} {`2}  {<028>}; #nop {GREEN};
+    #replace {%1} {`3}  {<038>}; #nop {YELLOW};
+    #replace {%1} {`4}  {<048>}; #nop {BLUE};
+    #replace {%1} {`5}  {<058>}; #nop {PURPLE};
+    #replace {%1} {`6}  {<068>}; #nop {CYAN};
+    #replace {%1} {`7}  {<eee>}; #nop {WHITE};
+    #replace {%1} {`8}  {<ccc>}; #nop {GRAY};
+    #replace {%1} {`9}  {<158>}; #nop {PURPLE BOLD};
+    #replace {%1} {`!}  {<118>}; #nop {RED BOLD};
+    #replace {%1} {`@}  {<128>}; #nop {GREEN BOLD};
+    #replace {%1} {`#}  {<138>}; #nop {YELLOW BOLD};
+    #replace {%1} {`\$} {<148>}; #nop {BLUE BOLD};
+    #replace {%1} {`%}  {<158>}; #nop {PURPLE BOLD};
+    #replace {%1} {`^}  {<168>}; #nop {CYAN BOLD};
+    #replace {%1} {`&}  {<178>}; #nop {WHITE BOLD};
+    #replace {%1} {``}  {<088>}; #nop {RESET TO DEFAULT};
+
+    };
+    
+#event {IAC WILL MSDP} {#send {$IAC$DO$MSDP\}};
+
+#event {IAC SB MSDP} {
+
+    #if { "%0" == "ROOM_MAP" } {
+        
+        #var {room[map]} {%1};
+    
+        replace_color_codes room[map];
+
+        #replace {room[map]} {\r}  { };
+        
+        #script {path} {tmux display -t 2 -p "#{pane_height}"};
+
+        #if { "$path[1]" != "12" } {
+        
+            #sys tmux resize-pane -t 2 -y 12;
+            
+            }; 
+        
+        #if { "$room[map]" == " " } {
+        
+            #12 { #line log {log/02} { } };
+            
+            } {
+            
+            #line log {log/02} { <174>   MAP   <088> };
+            
+            #line log {log/02} { $room[map]};
+            
+            };
+        
+        #unvar {room[map]};
+            
+        } {
+        
+        #if { "%0" == "ROOM_%w" } {
+    
+            #regexp {%0} {ROOM_{.*}} { #format {temp} {%l} {&1} };
+            
+            #var room[$temp] {%1};
+            
+            };
+    
+        };
+        
+    #if { "%0" == "AREA_NAME" } {
+    
+        #var {msdp[area]} {%1};
+             
+        };
+       
+    #if { "%0" == "ADRENALINE" } {
+    
+        #var {msdp[adrenaline]} {%1};
+        
+        };
+        
+    #if { "%0" == "WORLD_TIME" } {
+    
+        #var {06[time]} {#[fg=white]%1};
+        
+        #delay {24} {#var {06[time]} {#[fg=white bold]%1#[fg=white none]}}
+        
+        };
+        
+    #if { "%0" == "THIRST" } {
+    
+        #if { "%1" == "[*----]" || "%1" == "[-----]" } {
+        
+            #var {06[thirst]} {#[fg=white][thirst]#[fg=red]%1};
+            
+            } {
+            
+            #var {06[thirst]} {#[fg=white][thirst]#[fg=white]%1};
+            
+            };
+            
+        };
+        
+    #if { "%0" == "HUNGER" } {
+    
+        #if { "%1" == "[*----]" || "%1" == "[-----]" } {
+        
+            #var {06[hunger]} {#[fg=white][hunger]#[fg=red]%1};
+            
+            } {
+            
+            #var {06[hunger]} {#[fg=white][hunger]#[fg=white]%1};
+            
+            };
+            
+        };
+        
+    #if { "%0" == "HITROLL" } {
+    
+        #var {msdp[hit]} {%1};
+        
+        };
+        
+    #if { "%0" == "DAMROLL" } {
+    
+        #var {msdp[dam]} {%1};
+        
+        };
+        
+    #if { "%0" == "GOLD" } {
+    
+        #var {path} {%1};
+        
+        #format {path} {%g} {$path};
+        
+        #if { %1 >= 10000 } {
+        
+            #var {06[gold]} {#[fg=white]gold:#[fg=yellow]$path};
+            
+            } {
+            
+            #var {06[gold]} {#[fg=white]gold:#[fg=white]$path};
+            
+            };
+        
+        };
+        
+    #if { "%0" == "EXPERIENCE_MAX" } {
+    
+        #var {xp[max]} {%1};
+           
+        };
+        
+    #if { "%0" == "EXPERIENCE_TNL" } {
+    
+        #var {xp[tnl]} {%1};
+        
+        };
+          
+    #if { "%0" == "EXPERIENCE" } {
+    
+        #var {xp[reg]} {%1};
+        
+        #delay {.1} {
+        
+            #math {path} { $xp[tnl] - $xp[reg] };
+            
+            #format {path} {%g} {$path};
+        
+            #if { $path <= 1000 } {
+            
+                #var {06[true_tnl]} {#[fg=white]xptnl:#[fg=magenta]$path};
+                
+                } {
+                
+                #var {06[true_tnl]} {#[fg=white]xptnl:#[fg=white]$path};
+                
+                };
+            
+            };
+          
+        };
+        
+    #if { "%0" == "CHANNELS" } {
+    
+        #var {msdp[chat]} {%1};
+        
+        replace_color_codes msdp[chat];
+        
+        #replace {msdp[chat]} {\n}  { };
+        
+        #line log {log/04} { $msdp[chat]};
+        
+        };
+        
+    #if { "%0" == "AFFECTS" } {
+    
+        #var {05[affe]} {%1};
+        
+        };
+        
+    #if { "%0" == "INVENTORY" } {
+    
+        #var {05[inve]} {%1};
+
+        };
+         
+    #if { "%0" == "GROUP" } {
+    
+        #var {05[group]} {%1};
+          
+        };
+               
+    #if { "%0" == "TANK_NAME" && "%1" != "" } {
+    
+        #var {tank} {%1};
+          
+        };
+        
+    #if { "%0" == "AC_%w" } {
+    
+        #regexp {%0} {AC_{.*}} { #format {temp} {%l} {&1} };
+        
+        #var msdp[ac_$temp] {%1};
+    
+        };
+
+    #if { "%0" == "SAVING_%w" } {
+    
+        #regexp {%0} {SAVING_{.*}} { #format {temp} {%l} {&1} };
+        
+        #var msdp[saving_$temp] {%1};
+    
+        };
+    
+    #unvar temp;
+                            
+    };
+
+#nop { This event is generated at the end of an MSDP sub negotiation. };
+
+#event {IAC SB MSDP IAC SE} {#nop};
+
+#act {Torrents of rain flood through the area.} {msdp_report};
+
+#nop { Ask the server to report all keys inside REPORTABLE_VARIABLES. };
+
+#alias {msdp_report} {
+    
+    #var REPORTABLE_VARIABLES {
+        {AFFECTS};
+        {EXPERIENCE};
+        {EXPERIENCE_MAX};
+        {EXPERIENCE_TNL};
+        {SHIELD};
+        {POWER};
+        {CHII};
+        {HEALTH};
+        {HEALTH_MAX};
+        {MANA};
+        {MANA_MAX};
+        {MOVEMENT};
+        {MOVEMENT_MAX};
+        {HITROLL};
+        {DAMROLL};
+        {COMBAT_STYLE};
+        {AREA_NAME};
+        {ROOM_EXITS};
+        {ROOM_NAME};
+        {ROOM_VNUM};
+        {ROOM_DESC};
+        {WORLD_TIME};
+        {ROOM_MAP};
+        {ROOM_TERRAIN};
+        {GROUP};
+        {CHANNELS};
+        {INVENTORY};
+        {OPPONENT_NAME};
+        {OPPONENT_LEVEL};
+        {OPPONENT_HEALTH};
+        {OPPONENT_HEALTH_MAX};
+        {OPPONENT_COMBAT_STYLE};
+        {OPPONENT_WEAPON_OFFH};
+        {CHARACTER_NAME};
+        {TITLE};
+        {ADRENALINE};
+        {RACE};
+        {CLASS};
+        {GOLD};
+        {SHIELD_MAX};
+        {AC_PIERCE};
+        {AC_BASH};
+        {AC_SLASH};
+        {AC_MAGIC};
+        {SAVING_AFF};
+        {SAVING_MAL};
+        {SAVING_MEN};
+        {WEIGHT};
+        {WEIGHT_MAX};
+        {TANK_NAME};
+        {HUNGER};
+        {THIRST};
+        {OVERLORD};
+        {POKER};
+        {HINT};
+        };
+    
+    #var result {$IAC$SB$MSDP${VAR}REPORT};
+
+    #foreach {$REPORTABLE_VARIABLES[]} {tmp} {
+
+        #var result {$result${VAL}$tmp};
+
+        };
+
+    #send {$result$IAC$SE\};
+    
+    #unvar REPORTABLE_VARIABLES
+    
+    };
+
+#alias {msdp_list} {#send {$IAC$SB$MSDP${VAR}LIST${VAL}%0$IAC$SE\}};
+
+#alias {msdp_send} {#send {$IAC$SB$MSDP${VAR}SEND${VAL}%0$IAC$SE\}};
+
+#nop { If msdp_report hasn't been sent, send msdp_report and unevent. };
+
+#if { "$msdp[active]" != "1" } {
+
+    #event {RECEIVED OUTPUT} {
+
+        #delay {.50} {msdp_report};
+        
+        #unevent {RECEIVED OUTPUT};
+
+        };
+
+    };
+
+#nop { Connect to your MUD };
+#nop { ******************* };
+
+#var mud[name] abandonedrealms;
+
+#var mud[host] abandonedrealms.com;
+
+#var mud[port] 9000;
+
+#ses $mud[name] $mud[host] $mud[port];
+
+#alias {exit} {#if { "$tmux[use]" == "no" } {#end} {#sys tmux kill-server}};
+
+#event {SESSION DEACTIVATED} {
+
+    #gts {
+    
+        #delay {.5} {
+        
+            #show {<138>Recconect? y/n<088>};
+            
+            #macro {n} { 
+            
+                #if { "$tmux[use]" == "no" } {#end} {#sys tmux kill-server};
+                
+                };
+                
+            #macro {y} { 
+            
+                #unmacro {n}; #unmacro {y}; #read {main.tin} };
+            
+            };
+        };
+    };
+    
+#nop { Exits trigger };
+#nop { ************* };
+
+#act {~^[Exits: %1]$} {
+
+    #var exits {%1};
+
+    #if { "$gag_exits" == "1" } { #line gag };
+
+    };
+
+#nop { Various character states are set here };
+#nop { ************************************* };
+
+#nop    { Character is/isn't overburnded };
+
+#act {You feel suddenly overburdened by weight.} { #var burden 1; };
+
+#act {You are no longer overburdened by weight.} { #var burden 0; };
+
+#nop    { Character is a ghost };
+
+#act {You turn into an invincible ghost for a few minutes.} {
+
+    #var my[state] {ghost};
+    
+    };
+
+#nop    { Character is/isn't daydreaming };
+
+#act {Your mind wanders into a daydream of another, much stranger world.} {
+
+    #var my[state] {daydreaming};
+    
+    };
+    
+#act {You snap suddenly out of the daydream you were in.} { 
+
+    #var my[state] {standing};    
+    
+    };
+
+#nop    { Character is standing };
+
+#act {You wake and stand up.} { #var my[state] {standing} };
+
+#act {You stand up.} { #var my[state] {standing} };
+
+#nop    { Character is sleeping };
+
+#act {You go to sleep on %1.} { #var my[state] {sleeping} };
+
+#act {You go to sleep.} { #var my[state] {sleeping} };
+
+#act {In your dreams, or what?} { #var my[state] {sleeping} };
+
+#act {You are already sleeping.} { #var my[state] {sleeping} };
+
+#act {You can't see anything, you're sleeping!} { #var my[state] {sleeping} };
+
+#nop    { Character is sitting };
+
+#act {You wake and sit on %1.} { #var my[state] {sitting} };
+
+#act {You wake and sit up.} { #var my[state] {sitting} };
+
+#act {You stop resting.} { #var my[state] {sitting} };
+
+#act {You sit down.} { #var my[state] {sitting} };
+
+#nop    { Character is resting };
+
+#act {You wake up and start resting.} { #var my[state] {resting} };
+
+#act {You wake up and rest on %1.} { #var my[state] {resting} };
+
+#act {You have been KILLED!!} { #var my[state] {resting} };
+
+#act {You rest.} { #var my[state] {resting} };
+
+#nop { who };
+#nop { *** };
+
+#class who open
+
+#act {Players found: %1} {
+    #delay {.5} { #var gag_who off };
+    #if { "$gag_who" == "on" } { #line gag };
+    }
+
+#act {^There is %1 character on\; the most on this past month was %2.$} {
+    #if { "$gag_who" == "on" } { #line gag };
+    }
+
+#act {^There are %1 characters on\; the most on this past month was %2.$} {
+    #if { "$gag_who" == "on" } { #line gag };
+    }
+
+#act {^[%1 %2 %3] <%4> %5 %6$} {
+    #var {player[%5]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {1}
+    
+#act {^[%1 %2 %3] Lord %4 %5$} {
+    #var {player[%4]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {2}
+
+#act {^[%1 %2 %3] %4 %5$} {
+    #var {player[%4]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {2}
+
+#act {^[%1 %2 %3] [%4] %5 %6$} {
+    #var {player[%5]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {2}
+
+#act {^[   %1    ] <%2> [%3] %4 %5$} {
+    #var {player[%4]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {2}
+
+#act {^[   %1    ] <%2> %3 %4$} {
+    #var {player[%3]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {3}
+    
+#act {^[   %1    ] [%2] %3 %4$} {
+    #var {player[%3]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {4}
+
+#act {^[   %1    ] Sir %3 %4$} {
+    #var {player[%3]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {1}
+
+#act {^[   %1    ] %2 %3$} {
+    #var {player[%2]} {};
+    #if { "$gag_who" == "on" } { #line gag };
+    } {5}
+    
+
+#class who close
+
+#nop { Ctrl + Shift + = or Ctrl + - zoom terminal text but panes need resize };
+
+#delay {1} {
+
+    #event {SCREEN RESIZE} {
+        
+        #sys tmux resize-pane -t %%1 -x $tmux[left_wide];
+        
+        #sys tmux resize-pane -x $tmux[main_wide];
+        
+        };
+        
+    };
+    
+#event {VARIABLE UPDATE 06} {
+    
+    #delay {.1} {
+        
+        #sys {
+        
+            tmux set -g status-left 
+            "$06[time] $06[hunger] $06[thirst] $06[gold] $06[true_tnl]";
+            
+            };      
+        
+        };
+    
+    };
+
+#event {VARIABLE UPDATE 05} {
+    
+    #delay {.1} {
+
+        #nop { INVENTORY };
+        #nop { ********* };
+        
+        #line log {log/05} { <174>INVENTORY<088> };
+                                  
+        #foreach {$05[inve][]} {item} {
+
+            #if { "$05[inve][$item]" > "1" } {
+            
+                #line log {log/05} {    $item ($05[inve][$item])};
+            
+                } {
+                
+                #line log {log/05} {    $item };
+                
+                };
+            
+            };
+            
+        #nop { GROUP };
+        #nop { ***** };
+        
+        #line log {log/05} {\n <174>  GROUP  <088> };
+
+        #foreach {$05[group][]} {mate} {
+
+            #regexp {$05[group][$mate]} {"hp":%d,"mp":%d} {
+
+                #var mate_hp &1;
+
+                #var mate_mp &2;
+                
+                };
+            
+            #var {color[mate]} {<088>};
+            
+            #if { $mate_hp <= 40 && $mate_hp >= 21 } {
+            
+                #var {color[mate]} {<538>};
+                
+                }; 
+                
+            #if { $mate_hp <= 20 } {
+            
+                #var {color[mate]} {<518>};
+                
+                };   
+                                  
+            #line log {log/05} {    $color[mate]($mate_hp) $mate<088> };
+                                               
+            };
+             
+        #nop { AFFECTS };
+        #nop { ******* };
+        
+        #line log {log/05} {\n <174> AFFECTS <088> };
+        
+        #if { "$05[affe][$spell]" == "0" } {
+        
+            #line log {log/05} {    You are not under any affects.};
+            
+            } {
+            
+            #foreach {$05[affe][]} {spell} {
+                        
+                #line log {log/05} {    $spell $05[affe][$spell] };
+                
+                };
+                
+            };
+            
+        #math {tmux[y]} { &05[group][] + &05[inve][] + &05[affe][] + 6 };
+        
+        #script {path} {tmux display -t 5 -p "#{pane_height}"};
+        
+        #if { "$path[1]" != "$tmux[y]" } {
+        
+            #sys { tmux resize-pane -t %%5 -y $tmux[y] };
+        
+            };
+        };
+    };
