@@ -1,3 +1,8 @@
+See readme here:
+https://github.com/animalprimate/ARTT/raw/main/README.md
+
+(it makes more sense)
+
 ARTT (ABANDONED REALMS TINTIN++) SCRIPTS WRITTEN BY GAZKUL.
 most recent: https://sourceforge.net/projects/artt/files/
 
