@@ -1,4 +1,4 @@
-See readme here:
+See raw readme here:
 https://github.com/animalprimate/ARTT/raw/main/README.md
 
 (it makes more sense)
