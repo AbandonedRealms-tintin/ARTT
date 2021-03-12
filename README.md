@@ -39,7 +39,7 @@ https://abandonedrealms.com/roleplay/
 
 Setup:
 install Tintin++/Wintin++
-install linux*
+install linux* 
 install vim*
 install tmux*
 
