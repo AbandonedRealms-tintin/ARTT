@@ -27,25 +27,25 @@ Install Wintin++</br>
 move ARTT to folder</br>
 (Windows support is minimal atm)
 
-more helpful links:
-https://abandonedrealms.com/help/pk_control.php
-https://abandonedrealms.com/help/pk_newbie.php
-https://abandonedrealms.com/essays/stages.php
-https://abandonedrealms.com/essays/rp.php
-https://abandonedrealms.com/roleplay/
+more helpful links:</br>
+https://abandonedrealms.com/help/pk_control.php</br>
+https://abandonedrealms.com/help/pk_newbie.php</br>
+https://abandonedrealms.com/essays/stages.php</br>
+https://abandonedrealms.com/essays/rp.php</br>
+https://abandonedrealms.com/roleplay/</br>
 
-Thanks to:
-https://abandonedrealms.com/
-For maintaining this MUD.
+Thanks to:</br>
+https://abandonedrealms.com/</br>
+For maintaining this MUD.</br>
 
-Thanks to:
-https://tintin.mudhalla.net/
-For maintaining tintin clent.
+Thanks to:</br>
+https://tintin.mudhalla.net/</br>
+For maintaining tintin clent.</br>
 
-Thanks to:
-https://github.com/LokiChaos/vim-tintin
-For creating tt++ vim syntax.
+Thanks to:</br>
+https://github.com/LokiChaos/vim-tintin</br>
+For creating tt++ vim syntax.</br>
 
-Thanks to:
-Linux/open source software philosophy
-for making all our lives richer.
+Thanks to:</br>
+Linux/open source software philosophy</br>
+for making all our lives richer.</br>
