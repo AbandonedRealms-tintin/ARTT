@@ -1,10 +1,10 @@
-See raw readme here:
-https://github.com/animalprimate/ARTT/raw/main/README.md
+ARTT (Abandoned Realms / TinTin++)
 
-(it makes more sense)
+GAME SERVER: https://abandonedrealms.com/
 
-ARTT (ABANDONED REALMS TINTIN++) SCRIPTS WRITTEN BY GAZKUL.
-most recent: https://sourceforge.net/projects/artt/files/
+GAME CLIENT: https://tintin.mudhalla.net/
+
+GAME SCRIPT: https://sourceforge.net/projects/artt/files/latest/download
 
 Abandoned Realms is a roleplaying enforced, playerkilling encouraged
 MUD.  This is not a world you will spend your time in alone.  There
@@ -14,58 +14,25 @@ enemies, who you may well be living in fear of.  These are real people,
 and they will have ambitions and goals just like you.  The people are
 what give Abandoned Realms its charm and make this a real experience.
 
-General Guidelines Playing
+Linux:
+install tintin++ vim tmux
+Place ARTT directory home
+find and type './linux.sh'
 
-BASIC COMMANDS          PURPOSE
-n/e/s/w/u/d             movement
-scan/map/mm/where       exploration commands
-rest/sleep/wake/stand   resting commands
-consider/kill/flee      attack commands
-examine/compare         object commands
-auto/color/prompt       configuration commands
-recall                  travel to your hometown temple
-prac                    a list of your abilities
-equipment/inv           shows your belongings
-outfit                  receive the starting items
-score                   shows all of your characters statistics
-affects                 shows skills/spells in effect on you
+use 'ls' to list scripts.
+use 'vi <script name>' to edit scripts via CLI.
 
-GETTING HELP
-help <subject>          search for a specific solution
-help newbie areas       list of recommended areas for new players
-newbie <message>        contact other newbies with questions
+Windows:
+Install Wintin++
+move ARTT to folder
+(Windows support is minimal atm)
 
-links:
+more helpful links:
 https://abandonedrealms.com/help/pk_control.php
 https://abandonedrealms.com/help/pk_newbie.php
 https://abandonedrealms.com/essays/stages.php
 https://abandonedrealms.com/essays/rp.php
 https://abandonedrealms.com/roleplay/
-
-Setup:
-install Tintin++/Wintin++
-install linux* 
-install vim*
-install tmux*
-
-*optional
-
-Wintin++:
-Install Wintin++ (for windows) and
-unzip files into proper directory.
-
-Tintin++:
-unzip ARTT directory in home folder.
-Open terminal and navigate to it.
-use 'tt++ main.tin' or '#read main.tin' to launch.
-
-Linux commands for scripting:
-
-use 'ls' to list scripts.
-use 'vi <script name>' to edit scripts via CLI.
-
-vi/vim is a CLI based text editor, if unfamiliar you can google info:
-https://www.linux.com/training-tutorials/vim-101-beginners-guide-vim/
 
 Thanks to:
 https://abandonedrealms.com/
