@@ -15,16 +15,16 @@ and they will have ambitions and goals just like you.  The people are
 what give Abandoned Realms its charm and make this a real experience.
 
 Linux:</br>
-install tintin++ vim tmux<br/>
-Place ARTT directory home
-find and type './linux.sh'
+install tintin++ vim tmux</br>
+Place ARTT directory home</br>
+find and type './linux.sh'</br>
 
-use 'ls' to list scripts.
+use 'ls' to list scripts.</br>
 use 'vi <script name>' to edit scripts via CLI.
 
-Windows:
-Install Wintin++
-move ARTT to folder
+Windows:</br>
+Install Wintin++</br>
+move ARTT to folder</br>
 (Windows support is minimal atm)
 
 more helpful links:
