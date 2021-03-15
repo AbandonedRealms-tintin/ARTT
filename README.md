@@ -19,9 +19,6 @@ install tintin++ vim tmux</br>
 Place ARTT directory home</br>
 find and type './linux.sh'</br>
 
-use 'ls' to list scripts.</br>
-use 'vi <script name>' to edit scripts via CLI.
-
 Windows:</br>
 Install Wintin++</br>
 move ARTT to folder</br>
