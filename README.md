@@ -14,12 +14,9 @@ enemies, who you may well be living in fear of.  These are real people,
 and they will have ambitions and goals just like you.  The people are
 what give Abandoned Realms its charm and make this a real experience.
 
-Linux:
-
-install tintin++ vim tmux
-
+Linux:</br>
+install tintin++ vim tmux<br/>
 Place ARTT directory home
-
 find and type './linux.sh'
 
 use 'ls' to list scripts.
