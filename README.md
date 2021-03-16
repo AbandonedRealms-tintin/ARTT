@@ -45,7 +45,6 @@ Windows 10 via WSL (Windows Subsystem for Linux):
     9) In maximized WSL Terminal type 'artt', OG source: https://tintin.mudhalla.net/install.php#Windows
 
 More helpful links:
-*******************
 
     https://abandonedrealms.com/help/pk_control.php
 
