@@ -14,35 +14,45 @@ enemies, who you may well be living in fear of.  These are real people,
 and they will have ambitions and goals just like you.  The people are
 what give Abandoned Realms its charm and make this a real experience.
 
-Linux:</br>
-install tintin++ vim tmux</br>
-Place ARTT directory home</br>
-find and type './linux.sh'</br>
+Linux:
+******
 
-Windows:</br>
-Install Wintin++</br>
-move ARTT to folder</br>
-(Windows support is minimal atm)
+    1) install tintin++ vim tmux
 
-more helpful links:</br>
-https://abandonedrealms.com/help/pk_control.php</br>
-https://abandonedrealms.com/help/pk_newbie.php</br>
-https://abandonedrealms.com/essays/stages.php</br>
-https://abandonedrealms.com/essays/rp.php</br>
-https://abandonedrealms.com/roleplay/</br>
+    2) Place ARTT directory home
 
-Thanks to:</br>
-https://abandonedrealms.com/</br>
-For maintaining this MUD.</br>
+    3) find and type './linux.sh'
 
-Thanks to:</br>
-https://tintin.mudhalla.net/</br>
-For maintaining tintin clent.</br>
+Windows 10 via WSL (Windows Subsystem for Linux):
+*************************************************
 
-Thanks to:</br>
-https://github.com/LokiChaos/vim-tintin</br>
-For creating tt++ vim syntax.</br>
+    1) Use search assistant to open the 'For Developers' setting and enable 'Developer Mode'.  Accept it.
 
-Thanks to:</br>
-Linux/open source software philosophy</br>
-for making all our lives richer.</br>
+    2) Ctrl+Esc & type 'Turn Windows features on or off' select and turn on 'Windows Subsystem for Linux'
+
+    3) Open web browser and type 'https://aka.ms/wslstore' now select/install Ubuntu, set up and sign in.
+
+    4) In Ubuntu type 'sudo apt-get update' and 'sudo apt-get upgrade' and 'sudo apt-get install tintin++'
+
+    5) Download and run relevant wsltty installer from github: https://github.com/mintty/wsltty/releases
+
+    6) Open web browser and type 'https://sourceforge.net/projects/artt/files/latest/download' save/extract
+
+    7) In WSL Terminal, navigate to /mnt/c/Users/<user_name>/Downloads/ARTT_<version>, type 'cp -R ARTT ~/'
+
+    8) Next I type 'echo "alias artt='cd $HOME/ARTT;tmux new tt++ main.tin'" >> ~/.bashrc;source ~/.bashrc'
+
+    9) In maximized WSL Terminal type 'artt', OG source: https://tintin.mudhalla.net/install.php#Windows
+
+More helpful links:
+*******************
+
+    https://abandonedrealms.com/help/pk_control.php
+
+    https://abandonedrealms.com/help/pk_newbie.php
+
+    https://abandonedrealms.com/essays/stages.php
+
+    https://abandonedrealms.com/essays/rp.php
+
+    https://abandonedrealms.com/roleplay/
