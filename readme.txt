@@ -38,7 +38,7 @@ Windows 10 via WSL (Windows Subsystem for Linux):
 
     6) In WSL Terminal home directory, type 'git clone https://github.com/AbandonedRealms-tintin/ARTT.git'
 
-    7) In WSL Terminal type 'cd ~/ARTT' in ARTT directory type './linux.sh' this will setup/launch game.
+    7) In WSL Terminal type 'cd ~/ARTT' & 'chmod +x linux.sh' & './linux.sh' this will setup/launch game.
 
 More helpful links:
 *******************
