@@ -32,17 +32,13 @@ Windows 10 via WSL (Windows Subsystem for Linux):
 
     3) Open web browser and type 'https://aka.ms/wslstore' now select/install Ubuntu, set up and sign in.
 
-    4) Type 'sudo apt-get update' and 'sudo apt-get upgrade' and 'sudo apt-get install tmux vim tintin++'
+    4) Type 'sudo apt-get update' & 'sudo apt-get upgrade' & 'sudo apt-get install tintin++ imagemagick'
 
-    5) Download/run Mintty WSL Bridge and wsltty installer: https://github.com/mintty/wsltty/releases
+    5) Download and run relevant wsltty installer from github: https://github.com/mintty/wsltty/releases
 
-    6) Open web browser and type 'https://sourceforge.net/projects/artt/files/latest/download' save/extract
+    6) In WSL Terminal home directory, type 'git clone https://github.com/AbandonedRealms-tintin/ARTT.git'
 
-    7) Using WSL Terminal navigate to /mnt/c/Users/<user_name>/Downloads/ARTT_<version>, type 'cp -R ARTT ~/'
-
-    8) Next I type 'echo "alias artt='cd $HOME/ARTT;tmux new tt++ main.tin'" >> ~/.bashrc;source ~/.bashrc'
-
-    9) WSL Terminal, maximize it and type 'artt', OG source: https://tintin.mudhalla.net/install.php#Windows
+    7) In WSL Terminal type 'cd ~/ARTT' in ARTT directory type './linux.sh' this will setup/launch game.
 
 More helpful links:
 *******************

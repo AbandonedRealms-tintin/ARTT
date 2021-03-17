@@ -22,13 +22,13 @@ which tmux > /dev/null 2>&1 || { echo "Please install tmux"; exit 1; }
 
 # Set term variable. Thanks: https://stackoverflow.com/a/63721547
 
-terminal=$(ps -o comm= -p "$(($(ps -o ppid= -p "$(($(ps -o sid= -p "$$")))")))" | grep -Eo 'mate-terminal|xfce4-terminal|gnome-terminal|lxterminal|xterm|konsole|x-terminal-emul|qterminal')
+terminal=$(ps -o comm= -p "$(($(ps -o ppid= -p "$(($(ps -o sid= -p "$$")))")))" | grep -Eo 'wslbridge2-back|mate-terminal|xfce4-terminal|gnome-terminal|lxterminal|xterm|konsole|x-terminal-emul|qterminal')
 
 # ----------------------------
 # Create desktop file for ARTT
 # ----------------------------
 
-if [ "$desktop_shortcut" = "1" ]; then
+if [ "$desktop_shortcut" = "1" ] && [ "$terminal" != "wslbridge2-back" ]; then
 
     # Files name/location
     
@@ -104,6 +104,30 @@ if [ "$desktop_shortcut" = "1" ]; then
             ln -s $HOME/.local/share/applications/AbandonedRealms.desktop $HOME/Desktop/.
         fi
     fi
+fi
+
+if [ "$desktop_shortcut" = "1" ] && [ "$terminal" == "wslbridge2-back" ]; then
+
+	desktop_file=$(ls /mnt/c/Users/*/Desktop | grep -o 'ARTT.lnk')
+	
+    if [ "$desktop_file" != "ARTT.lnk" ]; then
+
+		echo "Creating shortcut...  Please wait"
+		
+		wslusc --name ARTT --icon ~/ARTT/ar.png "/mnt/c/Users/owner/AppData/Local/wsltty/bin/mintty.exe --WSL= --configdir="C:\Users\owner\AppData\Roaming\wsltty" -w max -t Abandoned_Realms -e tmux new -c ~/ARTT tt++ main.tin"
+		
+	fi
+	
+fi
+
+# +------------------------------+
+# | wslbridge2-back, launch ARTT |
+# +------------------------------+
+
+if [ "$terminal" = "wslbridge2-back" ]; then
+
+    /mnt/c/Users/owner/AppData/Local/wsltty/bin/mintty.exe --WSL= --configdir="C:\Users\owner\AppData\Roaming\wsltty" -w max -T 'Abandoned Realms' -e tmux new -c ~/ARTT 'tt++ main.tin'
+
 fi
 
 # +--------------------+

@@ -16,11 +16,7 @@
 #nop { Alias };
 #nop { ***** };
 
-#alias {exit} { 
-
-	#if { "$tmux[use]" == "no" } {#end} {#sys tmux kill-server};
-	
-	};
+#alias {exit} { #if { "$tmux[use]" == "no" } {#end} {#sys tmux kill-server} };
 
 #nop { Is it linux? };
 #nop { ************ };
@@ -33,19 +29,18 @@
 
 #var {have[linux]} {$path[1]};
 
+#nop { Is it Windows Subsystem for Linux (WSL)? };
+#nop { **************************************** };
+
+#script {path} {
+
+    uname -a | grep -o "Microsoft" > /dev/null 2>&1 && echo 'yes' || echo 'no';
+    
+    };
+
+#var {have[windows]} {$path[1]};
+
 #if { "$have[linux]" == "yes" } {
-
-	#nop { Is it Windows Subsystem for Linux (WSL)? };
-	#nop { **************************************** };
-
-	#script {path} {
-
-		uname -a | grep -o "Microsoft" > /dev/null 2>&1 
-		&& echo 'yes' || echo 'no';
-		
-		};
-		
-	#var {have[windows]} {$path[1]};
 
     #nop { Check/kill existing tt++ process };
     #nop { ******************************** };
@@ -86,16 +81,16 @@
         #script {path} {env | grep -q tmux && echo 'yes' || echo 'no'};
         
         #var {tmux[open]} {$path[1]};
-                
+           
         #if { "$tmux[open]" == "yes" } {
-                              
+         
             #nop { Count open panes, if count is 1 tmux is not setup };
             #nop { ************************************************* };
             
             #script {path} {tmux list-panes};
             
             #var {tmux[open_panes]} {&path[]};
-                     
+             
             #if { "$tmux[open_panes]" == "1" } {
 
                 #nop { Sleep 1/2 second letting term reach maximized width };
@@ -170,7 +165,7 @@
                 #sys { tmux selectp -L };
                 
                 };
-                      
+             
             #elseif { $tmux[term_wide] <= 120 && $tmux[open_panes] == 1 } {
                 
                 #show {<138>Maximize window size to use tmux.<088>};
@@ -194,7 +189,7 @@
             #sys {sleep 3};
             
             exit;  
-                  
+             
             };
 
         };
@@ -240,21 +235,6 @@
             #system { vi %1; };
                 
             };
-
-	#nop { Use notepad++ to edit scripts };
-	#nop { ***************************** };
-	
-	#if { "$have[windows]" == "yes" } {
-
-		#ali {notepad %1} {
-		
-			#sys {"/mnt/c/Program Files (x86)/Notepad++/notepad++.exe" %1 &};
-			
-			};
-			
-		#show {<138>notepad script.tin uses notepad++<088>};
-	
-	    };
 	
     #nop { Check if vim is installed };
     #nop { ************************* };
@@ -299,7 +279,7 @@
                 };
 
             };
-                    
+             
         #script {path} {
         
             [ -f $HOME/.vim/ftdetect/tt.vim ] 
@@ -352,13 +332,15 @@
             fi;
             
             };
-                            
+              
         } {
 
         #show {<138>Please install vim.<088>};
 
         };
 
+	#show {<138>Ctrl++ and Ctrl+- zooms font<088>};
+		
     } {
     
     #show {<138>Please install Linux.<088>};
@@ -431,7 +413,7 @@ http://tintin.sourceforge.net/msdp/ };
     #elseif { "%0" == "AREA_NAME" } {
     
         #var {room[area]} {%1};
-             
+         
         };
        
     #elseif { "%0" == "ADRENALINE" } {
@@ -587,7 +569,7 @@ http://tintin.sourceforge.net/msdp/ };
         };
         
     #unvar temp;
-                            
+     
     };
 
 #nop { This event is generated at the end of an MSDP sub negotiation. };
@@ -1284,7 +1266,7 @@ http://tintin.sourceforge.net/msdp/ };
                     };	
                 
                 };
-                                               
+              
             };
                 
         #nop { AFFECTS };
@@ -1299,7 +1281,7 @@ http://tintin.sourceforge.net/msdp/ };
             } {
             
             #foreach {$log05[affe][]} {spell} {
-                        
+             
                 #line log {log/05} {    $spell $log05[affe][$spell] };
                 
                 };
