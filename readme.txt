@@ -1,7 +1,7 @@
 ARTT (Abandoned Realms / TinTin++)
 
 GAME SERVER: https://abandonedrealms.com/
-
+c
 GAME CLIENT: https://tintin.mudhalla.net/
 
 GAME SCRIPT: https://sourceforge.net/projects/artt/files/latest/download
@@ -17,11 +17,11 @@ what give Abandoned Realms its charm and make this a real experience.
 Linux:
 ******
 
-    1) install tintin++ vim tmux
+    1) install: tintin++ vim tmux
 
-    2) Place ARTT directory home
+    2) Place ARTT directory in $HOME
 
-    3) find and type './linux.sh'
+    3) Enter ARTT & type './linux.sh'
 
 Windows 10 via WSL (Windows Subsystem for Linux):
 *************************************************

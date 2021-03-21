@@ -7,16 +7,41 @@
 #nop { Config };
 #nop { ****** };
 
+#var {artt[tips]} {yes};
+
 #var {tmux[use]} {yes};
 
 #var {tmux[main_wide]} {81};
 
-#var {tmux[left_wide]} {15};
+#var {tmux[left_wide]} {20};
+
+#nop { Terminal Colors (256) };
+#nop { ********************* };
+
+#nop { To a see a list of available colors use 'hues' };
+
+#nop { Window foreground/background color };
+
+#var {tmux[window_style]} {fg=colour247,bg=colour236};
+
+#nop { Pane borders foreground/background color };
+
+#var {tmux[pane_border_style]} {fg=colour236,bg=colour236};
+
+#nop { Pane active borders foreground/background color };
+
+#var {tmux[pane_active_border_style]} {fg=colour236,bg=colour236};
+
+#nop { status bar style colour };
+
+#var {tmux[status_style]} {fg=colour247,bg=colour236};
 
 #nop { Alias };
 #nop { ***** };
 
-#alias {exit} { #if { "$tmux[use]" == "no" } {#end} {#sys tmux kill-server} };
+#alias {hues} { #sys {./linux.sh} };
+
+#alias {exit} { #if { "$tmux[open]" == "no" } {#end} {#sys tmux kill-server} };
 
 #nop { Is it linux? };
 #nop { ************ };
@@ -47,24 +72,17 @@
     
     #script {path} {pidof tt++};
     
-    #if { "$path[1]" != "%d" && "$tmux[use]" == "yes" } {
+    #if { "$path[1]" != "%d" } {
       
-        #show {<118>IMPROPER PROGRAM SHUTDOWN DETECTED, RESTART!<088>};
+        #show {IMPROPER PROGRAM SHUTDOWN DETECTED, RESTART!};
         
-        #show {<118>EXIT GAME USING 'quit' OR 'exit' NEXT TIME!!<088>};
+        #show {EXIT GAME USING 'quit' OR 'exit' NEXT TIME!!};
         
         #sys {sleep 3};
         
-        #sys {tmux kill-server};
+        exit;
         
         };
-
-    #nop { Tintin help info };
-    #nop { **************** };
-
-    #show {<138>'#help' learn tt++ language.<088>};
-
-    #show {<138>'exit' to quit artt/tintin++<088>};
 
     #nop { Chosen to use tmux? };
     #nop { ******************* };
@@ -84,6 +102,46 @@
            
         #if { "$tmux[open]" == "yes" } {
          
+            #nop { TMUX CONFIG };
+            #nop { *********** };
+
+            #ali {set %1 '%2'} { #sys { tmux set -g %1 '%2' } };
+
+            #nop { so pane_id match pane_indexes };
+
+            #sys { tmux set -g pane-base-index 1 };
+
+            #nop { left status bar message };
+
+            #sys { tmux setw -g window-status-current-format '' };
+
+            #sys { tmux set -g status-left '' };
+
+            #sys { tmux set -g status-right '' };
+
+            #nop { left status bar message space };
+
+            #sys { tmux set -g status-left-length 80 };
+
+            #nop { Give tmux some COLOUR };
+            #nop { ********************* };
+
+            #nop { status bar style colour };
+
+            set status-style '$tmux[status_style]';
+
+            #nop { color background/foreground of panes };
+
+            set window-style '$tmux[window_style]';
+
+            #nop { color active panes border };
+
+            set pane-active-border-style '$tmux[pane_active_border_style]';
+
+            #nop { color other panes borders };
+
+            set -g pane-border-style '$tmux[pane_border_style]';
+
             #nop { Count open panes, if count is 1 tmux is not setup };
             #nop { ************************************************* };
             
@@ -93,7 +151,10 @@
              
             #if { "$tmux[open_panes]" == "1" } {
 
+                #sho {Wait .5 for terminal to maximize...};
+
                 #nop { Sleep 1/2 second letting term reach maximized width };
+
                 #sys { sleep .5 };
 
                 };
@@ -102,30 +163,22 @@
             #nop { ********************** };
 
             #script {path} {tput cols};
+
             #var {tmux[term_wide]} {$path[1]};
 
             #script {path} {tput lines};
+
             #var {tmux[term_high]} {$path[1]};
             
             #math {both_wide} { $tmux[main_wide] + $tmux[left_wide] };
             
             #math {tmux[right_wide]} { $tmux[term_wide] - $both_wide };
 
+            #nop { Create/make blank log files for tmux to tail };
+
+            #loop 5 1 cnt {#sys > /tmp/0$cnt};                    
+
             #if { $tmux[term_wide] > 119 && $tmux[open_panes] == 1 } {
-
-                #sys { tmux source $HOME/ARTT/tmux.conf };
-
-                #script {path} {
-                    
-                    if [ ! -d "$HOME/ARTT/log" ]; 
-                    
-                        then mkdir $HOME/ARTT/log; 
-                        
-                    fi;
-                    
-                    };
-                
-                #loop 5 1 cnt {#sys > log/0$cnt};                    
                 
                 #nop { Any other tmux sessions named artt open? };
                 #nop { **************************************** };
@@ -135,7 +188,9 @@
                     tmux has -t artt > /dev/null 2>&1 && echo 'yes' || echo 'no'
                     
                     };
-                    
+                
+                #nop { If session exists recover, else rename current };
+
                 #if { "$path[1]" == "yes" } {
                 
                     #sys {tmux attach -t artt};
@@ -148,19 +203,23 @@
                 
                 #nop { Setup tmux panes for tail command of MUD logs };
                 
-                #sys { tmux split -b -h -l $tmux[left_wide] 'tail -f log/01' };
+                #alias {tail %1 '%2'} {#sys { tmux split %1 '%2' }};
 
-                #sys { tmux split -t %1 -l 1 'tail -f log/02' };
+                tail -b -h -l $tmux[left_wide] 'tail -f /tmp/01 2> /dev/null';
+
+                tail -t %1 -l 1 'tail -f /tmp/02 2> /dev/null';
 
                 #sys { tmux split -t %0 -h -l $tmux[right_wide] };
                 
-                #nop { Create pane 3. killp 3 so pane_id matches pane_indexes };
+                #nop { Create pane 3 };
                 
-                #sys { tmux split -t %3 -p 75 'tail -f log/04' };
-                
+                tail -t %3 -p 75 'tail -f /tmp/04 2> /dev/null';
+
+                #nop { Killp 3 so pane_id's matches pane_indexes };
+
                 #sys { tmux killp -t %3 };
                 
-                #sys { tmux split -t %4 -l 1 'tail -f log/05' };
+                tail -t %4 -l 1 'tail -f /tmp/05 2> /dev/null';
                 
                 #sys { tmux selectp -L };
                 
@@ -168,23 +227,25 @@
              
             #elseif { $tmux[term_wide] <= 120 && $tmux[open_panes] == 1 } {
                 
-                #show {<138>Maximize window size to use tmux.<088>};
+                #show {Maximize window size to use tmux.};
                 
-                #show {<138>Or edit #var tmux[use] = no<088>};
+                #show {Or edit #var tmux[use] = no};
                 
                 #sys {sleep 3};
                 
-                exit;
+                #end;
                 
                 };
                 
             #unvar {tmux[open_panes]};
+
+            #unali {tail %1 '%2'};
               
             } {
             
-            #show {<138>Please enter 'tmux' first.<088>};
+            #show {Please enter 'tmux' first.};
             
-            #show {<138>Or edit #var tmux[use] = no<088>};
+            #show {Or edit #var tmux[use] = no};
             
             #sys {sleep 3};
             
@@ -211,7 +272,7 @@
         
         #script {path} {pwd};
         
-        #show <148>$path[1]<088>;
+        #show {$path[1]};
         
         #script {path} {ls *.tin};
         
@@ -223,18 +284,18 @@
                 
         };
 
-    #show {<138>use ls to list tt++ scripts.<088>};
+    #if { "$artt[tips]" == "yes" } { #show {Use ls to list tt++ scripts.} };
 
     #nop { Use vi/vim to edit scripts };
     #nop { ************************** };
 
-        #show {<138>vi script.tin for CLI edits.<088>};
+    #if { "$artt[tips]" == "yes" } { #show {vi script.tin for CLI edits.} };
 
-        #alias {vi %1} {
-                
-            #system { vi %1; };
-                
-            };
+    #alias {vi %1} {
+            
+        #system { vi %1; };
+            
+        };
 	
     #nop { Check if vim is installed };
     #nop { ************************* };
@@ -261,7 +322,7 @@
                     
                     };
                     
-                #show {<138>coloured vim syntax off<088>};
+                #show {coloured vim syntax off};
                 
                 };
                 
@@ -274,7 +335,7 @@
                     
                     };
                 
-                #show {<138>coloured vim syntax on<088>};
+                #show {coloured vim syntax on};
                 
                 };
 
@@ -284,9 +345,9 @@
         
             [ -f $HOME/.vim/ftdetect/tt.vim ] 
             
-            && echo "<138>'syntax' toggles vim colors.<088>" 
+            && echo "'syntax' toggles vim colors." 
             
-            || echo "<138>Added colored syntax to vim.<088>";
+            || echo "Added colored syntax to vim.";
             
             }; 
             
@@ -335,21 +396,50 @@
               
         } {
 
-        #show {<138>Please install vim.<088>};
+        #if { "$artt[tips]" == "yes" } { #show {Install vim & code w/ color.} };
 
         };
 
-	#show {<138>Ctrl++ and Ctrl+- zooms font<088>};
+    #nop { More ARTT usage hints };
+    #nop { ********************* };
+
+    #if { "$artt[tips]" == "yes" } { #show {'#help' learn tt++ language.} };
+
+    #if { "$artt[tips]" == "yes" } { #show {'exit' to quit artt/tintin++} };
+
+	#if { "$artt[tips]" == "yes" } { #show {Ctrl++ and Ctrl+- zooms font} };
 		
     } {
     
-    #show {<138>Please install Linux.<088>};
+    #show {Please install Linux.};
     
     };
 
 #nop { MSDP is a data protocol to send out of bounds communication between a MUD
 server and a MUD client, and is specifically targeted at client side scripts:
 http://tintin.sourceforge.net/msdp/ };
+
+#nop { Possible Abandoned Realms MSDP variables:
+
+AC_BASH         AC_MAGIC               AC_PIERCE             AC_SLASH
+ADRENALINE      AFFECTS                AREA_NAME             CHANNELS
+CHARACTER_NAME  CHII_BOLT              CLASS                 COMBAT_STYLE
+CON             CON_PERM               DAMROLL               DEX
+DEX_PERM        ENERGY                 ENERGY_MAX            EXPERIENCE
+EXPERIENCE_MAX  EXPERIENCE_TNL         GOLD                  GROUP
+HEALTH          HEALTH_MAX             HINT                  HITROLL
+HUNGER          INT                    INT_PERM              INVENTORY
+LEVEL           MANA                   MANA_MAX              MOVEMENT
+MOVEMENT_MAX    OPPONENT_COMBAT_STYLE  OPPONENT_HEALTH       OPPONENT_HEALTH_MAX
+OPPONENT_LEVEL  OPPONENT_NAME          OPPONENT_WEAPON_OFFH  OPPONENT_WEAPON_TYPE
+OVERLORD        OVERLORD_NAME          POKER                 POWER
+QUESTOR         RACE                   ROOM_DESC             ROOM_EXITS
+ROOM_MAP        ROOM_NAME              ROOM_TERRAIN          ROOM_VNUM
+SAVING_AFF      SAVING_MAL             SAVING_MEN            SHIELD
+SHIELD_MAX      STR                    STR_PERM              TANK_NAME
+TARGET          THIRST                 TITLE                 WEAPON_OFFH
+WEAPON_TYPE     WEIGHT                 WEIGHT_MAX            WIMPY
+WIS             WIS_PERM               WORLD_TIME };
 
 #format IAC  %a 255;
 #format DONT %a 254;
@@ -522,7 +612,7 @@ http://tintin.sourceforge.net/msdp/ };
         
         #replace {chat} {\n}  { };
         
-        #line log {log/04} { $chat};
+        #line log {/tmp/04} { $chat};
         
         };
         
@@ -696,9 +786,9 @@ http://tintin.sourceforge.net/msdp/ };
     
     } {
     
-    #show {<118>Unable to reach ${mud[host]}<088>};
+    #show {Unable to reach ${mud[host]}};
     
-    #show {<118>Check internet connection.<088>};
+    #show {Check internet connection.};
     
     #sys {sleep 3};
     
@@ -712,7 +802,7 @@ http://tintin.sourceforge.net/msdp/ };
     
         #delay {.5} {
         
-            #show {<138>Recconect? y/n<088>};
+            #show {Recconect? y/n};
             
             #macro {n} { 
             
@@ -727,17 +817,6 @@ http://tintin.sourceforge.net/msdp/ };
                 };
             };
         };
-    };
-    
-#nop { Exits trigger };
-#nop { ************* };
-
-#act {~^[Exits: %1]$} {
-
-    #var exits {%1};
-
-    #if { "$gag_exits" == "1" } { #line gag };
-
     };
 
 #nop { Various character states are set here };
@@ -1149,16 +1228,8 @@ http://tintin.sourceforge.net/msdp/ };
     #delay {.1} {
             
         #sys {
-        
-            tmux set -g status-left 
-            "  $log06[time]";
-            
-            }; 
 
-        #sys {
-        
-            tmux set -g status-right 
-            "$log06[hunger] $log06[thirst]              ";
+            tmux set -g status-left "$log06[time] $log06[hunger] $log06[thirst]"
             
             };      
         
@@ -1173,17 +1244,17 @@ http://tintin.sourceforge.net/msdp/ };
         #nop { INVENTORY };
         #nop { ********* };
         
-        #line log {log/05} { <174>INVENTORY<088> };
+        #line log {/tmp/05} { <174>INVENTORY<088> };
                                   
         #foreach {$log05[inve][]} {item} {
 
             #if { "$log05[inve][$item]" > "1" } {
             
-                #line log {log/05} {    $item ($log05[inve][$item])};
+                #line log {/tmp/05} {    $item ($log05[inve][$item])};
             
                 } {
                 
-                #line log {log/05} {    $item };
+                #line log {/tmp/05} {    $item };
                 
                 };
             
@@ -1191,12 +1262,12 @@ http://tintin.sourceforge.net/msdp/ };
         
         #unvar {item};
         
-        #line log {log/05} {    ($log05[lb]/$log05[lb_max] lbs & $log05[gold])};
+        #line log {/tmp/05} {    ($log05[lb]/$log05[lb_max] lbs & $log05[gold])};
         
         #nop { GROUP };
         #nop { ***** };
         
-        #line log {log/05} {\n <174>  GROUP  <088> };
+        #line log {/tmp/05} {\n <174>  GROUP  <088> };
 
         #nop { Calculate xptnl };
         #nop { *************** };
@@ -1227,11 +1298,11 @@ http://tintin.sourceforge.net/msdp/ };
                     
                     #if { "$memb" == "$whoami" } {
                     
-                        #line log {log/05} {    <088>(&1) $memb<088> $true_tnl};
+                        #line log {/tmp/05} {    <088>(&1) $memb<088> $true_tnl};
                         
                         } {
                         
-                        #line log {log/05} {    <088>(&1) $memb<088>};
+                        #line log {/tmp/05} {    <088>(&1) $memb<088>};
                         
                         };
                     
@@ -1241,11 +1312,11 @@ http://tintin.sourceforge.net/msdp/ };
                 
                     #if { "$memb" == "$whoami" } {
                     
-                        #line log {log/05} {    <538>(&1) $memb<088> $true_tnl};
+                        #line log {/tmp/05} {    <538>(&1) $memb<088> $true_tnl};
                         
                         } {
                         
-                        #line log {log/05} {    <538>(&1) $memb<088>};
+                        #line log {/tmp/05} {    <538>(&1) $memb<088>};
                         
                         };
                     
@@ -1255,11 +1326,11 @@ http://tintin.sourceforge.net/msdp/ };
                 
                     #if { "$memb" == "$whoami" } {
                     
-                        #line log {log/05} {    <518>(&1) $memb<088> $true_tnl};
+                        #line log {/tmp/05} {    <518>(&1) $memb<088> $true_tnl};
                         
                         } {
                         
-                        #line log {log/05} {    <518>(&1) $memb<088>};
+                        #line log {/tmp/05} {    <518>(&1) $memb<088>};
                         
                         };
                     
@@ -1272,17 +1343,17 @@ http://tintin.sourceforge.net/msdp/ };
         #nop { AFFECTS };
         #nop { ******* };
         
-        #line log {log/05} {\n <174> AFFECTS <088> };
+        #line log {/tmp/05} {\n <174> AFFECTS <088> };
         
         #if { "$log05[affe][$spell]" == "0" } {
         
-            #line log {log/05} {    You are not under any affects.};
+            #line log {/tmp/05} {    You are not under any affects.};
             
             } {
             
             #foreach {$log05[affe][]} {spell} {
              
-                #line log {log/05} {    $spell $log05[affe][$spell] };
+                #line log {/tmp/05} {    $spell $log05[affe][$spell] };
                 
                 };
                 
@@ -1328,13 +1399,13 @@ http://tintin.sourceforge.net/msdp/ };
     
     #if { "$room[map]" == " " } {
     
-        #12 { #line log {log/02} { } };
+        #12 { #line log {/tmp/02} { } };
         
         } {
         
-        #line log {log/02} {${pad}<174>   MAP   <088>};
+        #line log {/tmp/02} {${pad}<174>   MAP   <088>};
         
-        #line log {log/02} {${pad}$room[map]};
+        #line log {/tmp/02} {${pad}$room[map]};
         
         };
     
