@@ -6,6 +6,9 @@ GAME CLIENT: https://tintin.mudhalla.net/
 
 GAME SCRIPT: https://sourceforge.net/projects/artt/files/latest/download
 
+Game Description:
+*****************
+
 Abandoned Realms is a roleplaying enforced, playerkilling encouraged
 MUD.  This is not a world you will spend your time in alone.  There
 will be many other adventurers you run into, in the lands.  Some of
