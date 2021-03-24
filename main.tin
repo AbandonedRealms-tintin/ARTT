@@ -2,7 +2,7 @@
 #nop { A Playerkilling, Roleplaying MUD };
 #nop { Scripts need Tintin++/Wintin++ to run };
 
-#kill;
+#if { "$murder" != "no" } { #kill };
 
 #nop { Config };
 #nop { ****** };
@@ -18,26 +18,48 @@
 #nop { Terminal Colors (256) };
 #nop { ********************* };
 
-#nop { To a see a list of available colors use 'hues' };
+#nop { Type 'hues' w/tmux & list 256 colours };
 
-#nop { Window foreground/background color };
+#nop { Color font(fg) and background };
 
 #var {tmux[window_style]} {fg=colour247,bg=colour236};
 
-#nop { Pane borders foreground/background color };
+#nop { Color borders };
 
 #var {tmux[pane_border_style]} {fg=colour236,bg=colour236};
 
-#nop { Pane active borders foreground/background color };
+#nop { Color active borders };
 
 #var {tmux[pane_active_border_style]} {fg=colour236,bg=colour236};
 
-#nop { status bar style colour };
+#nop { Color status bar };
 
 #var {tmux[status_style]} {fg=colour247,bg=colour236};
 
 #nop { Alias };
 #nop { ***** };
+
+#alias {load} {
+
+    #var {murder} {no};
+
+    #line quiet { #show {reloading artt code...};
+
+        #read main.tin
+
+        };
+
+    };
+
+#alias {redo} { 
+
+    #line quiet { #show {killing/reloading code...};
+
+        #read main.tin
+
+        };
+
+    };
 
 #alias {hues} { #sys {./linux.sh} };
 
@@ -157,26 +179,28 @@
 
                 #sys { sleep .5 };
 
+                #nop { Get terminal width etc };
+                #nop { ********************** };
+
+                #script {path} {tput cols};
+
+                #var {tmux[term_wide]} {$path[1]};
+
+                #script {path} {tput lines};
+
+                #var {tmux[term_high]} {$path[1]};
+                
+                #math {both_wide} { $tmux[main_wide] + $tmux[left_wide] };
+                
+                #math {tmux[right_wide]} { $tmux[term_wide] - $both_wide };
+
                 };
-
-            #nop { Get terminal width etc };
-            #nop { ********************** };
-
-            #script {path} {tput cols};
-
-            #var {tmux[term_wide]} {$path[1]};
-
-            #script {path} {tput lines};
-
-            #var {tmux[term_high]} {$path[1]};
-            
-            #math {both_wide} { $tmux[main_wide] + $tmux[left_wide] };
-            
-            #math {tmux[right_wide]} { $tmux[term_wide] - $both_wide };
 
             #nop { Create/make blank log files for tmux to tail };
 
-            #loop 5 1 cnt {#sys > /tmp/0$cnt};                    
+            #loop {5} {1} {cnt} {#sys > /tmp/0$cnt};
+
+            #unvar {cnt};
 
             #if { $tmux[term_wide] > 119 && $tmux[open_panes] == 1 } {
                 
@@ -215,7 +239,7 @@
                 
                 tail -t %3 -p 75 'tail -f /tmp/04 2> /dev/null';
 
-                #nop { Killp 3 so pane_id's matches pane_indexes };
+                #nop { Kill pane 3 so pane_id's matches pane_indexes };
 
                 #sys { tmux killp -t %3 };
                 
@@ -284,12 +308,12 @@
                 
         };
 
-    #if { "$artt[tips]" == "yes" } { #show {Use ls to list tt++ scripts.} };
+    #if { "$artt[tips]" == "yes" } { #show {'ls' lists Tintin++ scripts.} };
 
     #nop { Use vi/vim to edit scripts };
     #nop { ************************** };
 
-    #if { "$artt[tips]" == "yes" } { #show {vi script.tin for CLI edits.} };
+    #if { "$artt[tips]" == "yes" } { #show {'vi <script_name>' and edit.} };
 
     #alias {vi %1} {
             
@@ -311,7 +335,7 @@
 
         #alias {syntax} {
         
-            #script path {cat ~/.vimrc | grep 'syntax *'};
+            #script {path} {cat ~/.vimrc | grep 'syntax *'};
             
             #if { "$path[1]" == "syntax on" } {
             
@@ -375,7 +399,7 @@
 
             if [ ! -f "$HOME/.vim/syntax/tt.vim" ];
             
-                then cp $HOME/ARTT/tt.vim $HOME/.vim/syntax;
+                then cp $HOME/ARTT/.tt.vim $HOME/.vim/syntax/tt.vim;
                 
             fi;
             
@@ -570,7 +594,7 @@ WIS             WIS_PERM               WORLD_TIME };
         
     #elseif { "%0" == "EXPERIENCE_MAX" } {
     
-        #var {log05[max]} {%1};
+        #var {log05[xpmax]} {%1};
            
         };
         
@@ -1207,7 +1231,7 @@ WIS             WIS_PERM               WORLD_TIME };
     #if { "$gag_who" == "on" } { #line gag };
     } {1};
       
-#nop { Ctrl + Shift + = or Ctrl + - zoom terminal text but panes need resize };
+#nop { When zooming terminal font panes need resizing };
 
 #delay {1} {
 
@@ -1263,11 +1287,6 @@ WIS             WIS_PERM               WORLD_TIME };
         #unvar {item};
         
         #line log {/tmp/05} {    ($log05[lb]/$log05[lb_max] lbs & $log05[gold])};
-        
-        #nop { GROUP };
-        #nop { ***** };
-        
-        #line log {/tmp/05} {\n <174>  GROUP  <088> };
 
         #nop { Calculate xptnl };
         #nop { *************** };
@@ -1289,7 +1308,12 @@ WIS             WIS_PERM               WORLD_TIME };
                 };
                 
             };
-            
+
+        #nop { GROUP };
+        #nop { ***** };
+        
+        #line log {/tmp/05} {\n <174>  GROUP  <088> };
+
         #foreach {$log05[group][]} {memb} {
 
             #regexp {$log05[group][$memb]} {"hp":%d,"mp":%d} {
@@ -1408,8 +1432,6 @@ WIS             WIS_PERM               WORLD_TIME };
         #line log {/tmp/02} {${pad}$room[map]};
         
         };
-    
-    #unvar {ROOM_MAP};
     
     #unvar {pad};
     

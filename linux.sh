@@ -18,8 +18,6 @@
 
 desktop_shortcut=1
 
-show_256=yes
-
 # No tt++ than exit.
 
 which tt++ > /dev/null 2>&1 || { echo "Please install tintin++"; exit 1; }
@@ -90,7 +88,7 @@ if [ "$desktop_shortcut" = "1" ] && [ "$terminal" != "wslbridge2-back" ]; then
 
         echo "Path=$HOME/ARTT/." >> $desktop_file
 
-        echo "Icon=$HOME/ARTT/ar.png" >> $desktop_file
+        echo "Icon=$HOME/ARTT/.ar.png" >> $desktop_file
         
         if [ "$terminal" = "lxterminal" ]; then
 
@@ -138,7 +136,7 @@ if [ "$desktop_shortcut" = "1" ] && [ "$terminal" == "wslbridge2-back" ]; then
 
 		echo "Creating shortcut...  Please wait"
 		
-		wslusc --name ARTT --icon ~/ARTT/ar.png "/mnt/c/Users/owner/AppData/Local/wsltty/bin/mintty.exe --WSL= --configdir="C:\Users\owner\AppData\Roaming\wsltty" -w max -t Abandoned_Realms -e tmux new -c ~/ARTT tt++ main.tin"
+		wslusc --name ARTT --icon ~/ARTT/.ar.png "/mnt/c/Users/owner/AppData/Local/wsltty/bin/mintty.exe --WSL= --configdir="C:\Users\owner\AppData\Roaming\wsltty" -w max -t Abandoned_Realms -e tmux new -c ~/ARTT tt++ main.tin"
 		
 	fi
 	
