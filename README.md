@@ -8,46 +8,46 @@ GAME SCRIPT: https://sourceforge.net/projects/artt/files/latest/download
 
 Game Description:
 
-    Abandoned Realms is a roleplaying enforced, playerkilling encouraged
-    MUD.  This is not a world you will spend your time in alone.  There
-    will be many other adventurers you run into, in the lands.  Some of
-    these adventurers will become your greatest allies.  Others will be
-    enemies, who you may well be living in fear of.  These are real people,
-    and they will have ambitions and goals just like you.  The people are
-    what give Abandoned Realms its charm and make this a real experience.
+Abandoned Realms is a roleplaying enforced, playerkilling encouraged
+MUD.  This is not a world you will spend your time in alone.  There
+will be many other adventurers you run into, in the lands.  Some of
+these adventurers will become your greatest allies.  Others will be
+enemies, who you may well be living in fear of.  These are real people,
+and they will have ambitions and goals just like you.  The people are
+what give Abandoned Realms its charm and make this a real experience.
 
 Linux:
 
-    1. install tintin++ vim tmux
+    Install tintin++ vim tmux
 
-    2. Place ARTT directory home
+    Place ARTT directory home
 
-    3. find and type './linux.sh'
+    Find and type './linux.sh'
 
 Windows 10 via WSL (Windows Subsystem for Linux):
 
-    1. Use search assistant to open the 'For Developers' setting and enable 'Developer Mode'.  Accept it.
+    Use search assistant to open the 'For Developers' setting and enable 'Developer Mode'.  Accept it.
 
-    2. Ctrl+Esc & type 'Turn Windows features on or off' select and turn on 'Windows Subsystem for Linux'
+    Ctrl+Esc & type 'Turn Windows features on or off' select and turn on 'Windows Subsystem for Linux'
 
-    3. Open web browser and type 'https://aka.ms/wslstore' now select/install Ubuntu, set up and sign in.
+    Open web browser and type 'https://aka.ms/wslstore' now select/install Ubuntu, set up and sign in.
 
-    4. Type 'sudo apt-get update' & 'sudo apt-get upgrade' & 'sudo apt-get install tintin++ imagemagick'
+    Type 'sudo apt-get update' & 'sudo apt-get upgrade' & 'sudo apt-get install tintin++ imagemagick'
 
-    5. Download and run relevant wsltty installer from github: https://github.com/mintty/wsltty/releases
+    Download and run relevant wsltty installer from github: https://github.com/mintty/wsltty/releases
 
-    6. In WSL Terminal home directory, type 'git clone https://github.com/AbandonedRealms-tintin/ARTT.git'
+    In WSL Terminal home directory, type 'git clone https://github.com/AbandonedRealms-tintin/ARTT.git'
 
-    7. In WSL Terminal type 'cd ~/ARTT' & 'chmod +x linux.sh' & './linux.sh' this will setup/launch game.
+    In WSL Terminal type 'cd ~/ARTT' & 'chmod +x linux.sh' & './linux.sh' this will setup/launch game.
 
 More helpful links:
 
-   https://abandonedrealms.com/help/pk_control.php
+https://abandonedrealms.com/help/pk_control.php
 
-   https://abandonedrealms.com/help/pk_newbie.php
+https://abandonedrealms.com/help/pk_newbie.php
 
-   https://abandonedrealms.com/essays/stages.php
+https://abandonedrealms.com/essays/stages.php
 
-   https://abandonedrealms.com/essays/rp.php
+https://abandonedrealms.com/essays/rp.php
 
-   https://abandonedrealms.com/roleplay/ 
+https://abandonedrealms.com/roleplay/ 
