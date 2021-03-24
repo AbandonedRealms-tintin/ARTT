@@ -54,4 +54,4 @@ More helpful links:
 
     https://abandonedrealms.com/essays/rp.php
 
-    https://abandonedrealms.com/roleplay/
+    https://abandonedrealms.com/roleplay/ 
