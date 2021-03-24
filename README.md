@@ -29,19 +29,19 @@ Linux:
 Windows 10 via WSL (Windows Subsystem for Linux):
 *************************************************
 
-    1) Use search assistant to open the 'For Developers' setting and enable 'Developer Mode'.  Accept it.
+1) Use search assistant to open the 'For Developers' setting and enable 'Developer Mode'.  Accept it.
 
-    2) Ctrl+Esc & type 'Turn Windows features on or off' select and turn on 'Windows Subsystem for Linux'
+2) Ctrl+Esc & type 'Turn Windows features on or off' select and turn on 'Windows Subsystem for Linux'
 
-    3) Open web browser and type 'https://aka.ms/wslstore' now select/install Ubuntu, set up and sign in.
+3) Open web browser and type 'https://aka.ms/wslstore' now select/install Ubuntu, set up and sign in.
 
-    4) Type 'sudo apt-get update' & 'sudo apt-get upgrade' & 'sudo apt-get install tintin++ imagemagick'
+4) Type 'sudo apt-get update' & 'sudo apt-get upgrade' & 'sudo apt-get install tintin++ imagemagick'
 
-    5) Download and run relevant wsltty installer from github: https://github.com/mintty/wsltty/releases
+5) Download and run relevant wsltty installer from github: https://github.com/mintty/wsltty/releases
 
-    6) In WSL Terminal home directory, type 'git clone https://github.com/AbandonedRealms-tintin/ARTT.git'
+6) In WSL Terminal home directory, type 'git clone https://github.com/AbandonedRealms-tintin/ARTT.git'
 
-    7) In WSL Terminal type 'cd ~/ARTT' & 'chmod +x linux.sh' & './linux.sh' this will setup/launch game.
+7) In WSL Terminal type 'cd ~/ARTT' & 'chmod +x linux.sh' & './linux.sh' this will setup/launch game.
 
 More helpful links:
 *******************
